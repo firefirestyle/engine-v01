@@ -1,11 +1,12 @@
 package user
 
 import (
+	"errors"
+
+	"github.com/firefirestyle/engine-v01/prop"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
-	m "github.com/firefirestyle/engine-v01/prop"
-	"errors"
 )
 
 type UserManagerConfig struct {
@@ -22,7 +23,7 @@ type UserManager struct {
 func NewUserManager(config UserManagerConfig) *UserManager {
 	obj := new(UserManager)
 	if config.UserKind == "" {
-		config.UserKind = "FFUser"
+		config.UserKind = "fu"
 	}
 	if config.UserPointerKind == "" {
 		config.UserPointerKind = config.UserKind + "-pointer"
@@ -44,15 +45,15 @@ func (obj *UserManager) NewNewUser(ctx context.Context) *User {
 }
 
 func (obj *UserManager) GetUserFromUserName(ctx context.Context, userName string) (*User, error) {
-	foundUser := obj.FindUserWithUserName(ctx, userName, false);
+	foundUser := obj.FindUserWithUserName(ctx, userName, false)
 	if len(foundUser.Users) == 0 {
-		return nil, errors.New("Not found "+userName)
+		return nil, errors.New("Not found " + userName)
 	}
 	return foundUser.Users[0], nil
 }
 
 func (obj *UserManager) SaveUser(ctx context.Context, userObj *User) error {
-	nextUser :=obj.cloneUser(ctx, userObj)
+	nextUser := obj.cloneUser(ctx, userObj)
 	e := nextUser.pushToDB(ctx)
 	if e == nil {
 		datastore.Delete(ctx, userObj.gaeObjectKey)
@@ -71,7 +72,7 @@ func Debug(ctx context.Context, message string) {
 }
 
 func MakePropValue(name, v string) string {
-	p := m.NewMiniProp()
+	p := prop.NewMiniProp()
 	p.SetString(name, v)
 	v = string(p.ToJson())
 	return v

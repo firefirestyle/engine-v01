@@ -9,7 +9,7 @@ import (
 
 	"strconv"
 
-	m "github.com/firefirestyle/engine-v01/prop"
+	paProp "github.com/firefirestyle/engine-v01/prop"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/datastore"
 )
@@ -69,7 +69,7 @@ type User struct {
 // ----
 
 func (obj *UserManager) newUserGaeObjectKey(ctx context.Context, userName, sign string) *datastore.Key {
-	return datastore.NewKey(ctx, obj.config.UserKind, obj.MakeUserGaeObjectKeyStringId(userName, sign), 0, nil)
+	return datastore.NewKey(ctx, obj.config.UserKind, obj.MakeStringId(userName, sign), 0, nil)
 }
 
 func (obj *UserManager) newUserWithUserName(ctx context.Context) *User {
@@ -78,13 +78,13 @@ func (obj *UserManager) newUserWithUserName(ctx context.Context) *User {
 	for {
 		hashObj := sha1.New()
 		now := time.Now().UnixNano()
-		io.WriteString(hashObj, m.MakeRandomId())
+		io.WriteString(hashObj, paProp.MakeRandomId())
 		io.WriteString(hashObj, strconv.FormatInt(now, 36))
 		userName := string(base32.StdEncoding.EncodeToString(hashObj.Sum(nil)))
 		if obj.config.LengthHash >= 5 && len(userName) > obj.config.LengthHash {
 			userName = userName[:obj.config.LengthHash]
 		}
-		userObj, err = obj.newUser(ctx, userName, strconv.FormatInt(now,16))
+		userObj, err = obj.newUser(ctx, userName, strconv.FormatInt(now, 16))
 		if err != nil {
 			break
 		}
@@ -200,7 +200,7 @@ func (obj *User) GetProp(name string) string {
 	if index < 0 {
 		return ""
 	}
-	p := m.NewMiniPropFromJson([]byte(obj.gaeObject.PropValues[index]))
+	p := paProp.NewMiniPropFromJson([]byte(obj.gaeObject.PropValues[index]))
 	return p.GetString(name, "")
 }
 
