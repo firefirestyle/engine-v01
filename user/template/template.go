@@ -46,8 +46,6 @@ type UserTemplateConfig struct {
 	TwitterAccessTokenSecret string
 	FacebookAppSecret        string
 	FacebookAppId            string
-
-	MemcachedOnlyInBlobPointer bool
 }
 
 type UserTemplate struct {
@@ -111,10 +109,9 @@ func (tmpObj *UserTemplate) GetUserHundlerObj(ctx context.Context) *userhundler.
 
 		tmpObj.userHandlerObj = userhundler.NewUserHandler(UrlUserCallbackBlobUrl,
 			userhundler.UserHandlerManagerConfig{ //
-				UserKind:                   tmpObj.config.KindBaseName,
-				BlobSign:                   tmpObj.config.PrivateKey,
-				MemcachedOnlyInBlobPointer: tmpObj.config.MemcachedOnlyInBlobPointer,
-				LengthHash:                 9,
+				UserKind:   tmpObj.config.KindBaseName,
+				BlobSign:   tmpObj.config.PrivateKey,
+				LengthHash: 9,
 			})
 
 		tmpObj.userHandlerObj.AddTwitterSession(twitter.TwitterOAuthConfig{

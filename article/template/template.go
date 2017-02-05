@@ -28,11 +28,9 @@ const (
 )
 
 type ArtTemplateConfig struct {
-	GroupName                  string
-	KindBaseName               string
-	PrivateKey                 string
-	MemcachedOnlyInBlobPointer bool
-	BasePath                   string
+	KindBaseName string
+	PrivateKey   string
+	BasePath     string
 }
 
 type ArtTemplate struct {
@@ -44,11 +42,8 @@ type ArtTemplate struct {
 }
 
 func NewArtTemplate(config ArtTemplateConfig, getUserHundler func(context.Context) *userHandler.UserHandler) *ArtTemplate {
-	if config.GroupName == "" {
-		config.GroupName = "FFS"
-	}
 	if config.KindBaseName == "" {
-		config.KindBaseName = "FFSArt"
+		config.KindBaseName = "fa"
 	}
 
 	if config.BasePath == "" {
@@ -96,7 +91,6 @@ func (tmpObj *ArtTemplate) GetArtHundlerObj(ctx context.Context) *arthundler.Art
 				ArticleKind:     tmpObj.config.KindBaseName,
 				BlobCallbackUrl: tmpObj.config.BasePath + UrlArtCallbackBlobUrl,
 				BlobSign:        appengine.VersionID(ctx),
-				MemcachedOnly:   tmpObj.config.MemcachedOnlyInBlobPointer,
 				LengthHash:      10,
 			})
 	}

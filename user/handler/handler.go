@@ -73,11 +73,10 @@ func NewUserHandler(callbackUrl string, //
 			Kind: config.SessionKind,
 		}),
 		blobHandler: blobhandler.NewBlobHandler(callbackUrl, config.BlobSign, miniblob.BlobManagerConfig{
-			Kind:                   config.BlobKind,
-			PointerKind:            config.BlobPointerKind,
-			CallbackUrl:            callbackUrl,
-			MemcachedOnlyInPointer: config.MemcachedOnlyInBlobPointer,
-			HashLength:             10,
+			Kind:        config.BlobKind,
+			PointerKind: config.BlobPointerKind,
+			CallbackUrl: callbackUrl,
+			HashLength:  10,
 		}),
 		onEvents: UserHandlerOnEvent{},
 	}

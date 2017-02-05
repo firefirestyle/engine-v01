@@ -36,7 +36,6 @@ type ArticleHandlerConfig struct {
 	TagKind         string
 	BlobCallbackUrl string
 	BlobSign        string
-	MemcachedOnly   bool
 	LengthHash      int
 }
 
@@ -73,11 +72,10 @@ func NewArtHandler(config ArticleHandlerConfig) *ArticleHandler {
 	//
 	artHandlerObj.blobHundler = blobhandler.NewBlobHandler(config.BlobCallbackUrl, config.BlobSign,
 		miniblob.BlobManagerConfig{
-			Kind:                   config.BlobKind,
-			CallbackUrl:            config.BlobCallbackUrl,
-			PointerKind:            config.BlobPointerKind,
-			MemcachedOnlyInPointer: config.MemcachedOnly,
-			HashLength:             10,
+			Kind:        config.BlobKind,
+			CallbackUrl: config.BlobCallbackUrl,
+			PointerKind: config.BlobPointerKind,
+			HashLength:  10,
 		})
 	artHandlerObj.blobHundler.AddOnBlobComplete(func(w http.ResponseWriter, r *http.Request, o *miniprop.MiniProp, hh *blobhandler.BlobHandler, i *miniblob.BlobItem) error {
 		dirSrc := r.URL.Query().Get("dir")

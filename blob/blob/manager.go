@@ -15,12 +15,11 @@ type BlobManager struct {
 }
 
 type BlobManagerConfig struct {
-	RootGroup              string
-	Kind                   string
-	PointerKind            string
-	CallbackUrl            string
-	MemcachedOnlyInPointer bool
-	HashLength             int
+	RootGroup   string
+	Kind        string
+	PointerKind string
+	CallbackUrl string
+	HashLength  int
 }
 
 func NewBlobManager(config BlobManagerConfig) *BlobManager {
