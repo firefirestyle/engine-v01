@@ -151,7 +151,7 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
 		} else {
 			tmpObj.GetArtHundlerObj(ctx).HandleFindBase(w, r, //
-				propObj.GetString("cursor", ""), loginInfo.AccessTokenObj.GetUserName(), map[string]string{}, []string{})
+				propObj.GetString("cursor", ""), loginInfo.AccessTokenObj.GetUserName(), map[string]string{}, []string{}, "-update")
 		}
 	})
 

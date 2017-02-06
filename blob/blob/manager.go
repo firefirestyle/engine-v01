@@ -15,7 +15,6 @@ type BlobManager struct {
 }
 
 type BlobManagerConfig struct {
-	RootGroup   string
 	Kind        string
 	PointerKind string
 	CallbackUrl string

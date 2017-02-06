@@ -50,6 +50,10 @@ func (obj *ArtQuery) WithUpdateMinus(ctx context.Context) *ArtQuery {
 	obj.q = obj.q.Order("-Updated")
 	return obj
 }
+func (obj *ArtQuery) WithUpdatePulas(ctx context.Context) *ArtQuery {
+	obj.q = obj.q.Order("Updated")
+	return obj
+}
 
 func (obj *ArtQuery) WithLimitOfFinding(ctx context.Context, limitOfFinding int) *ArtQuery {
 	obj.q = obj.q.Limit(limitOfFinding)

@@ -14,6 +14,7 @@ func (obj *ArticleHandler) HandleFind(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	cursor := values.Get("cursor")
 	userName := values.Get("userName")
+	mode := values.Get("mode")
 	tag := []string{}
 	props := map[string]string{}
 	for k, v := range values {
@@ -24,10 +25,11 @@ func (obj *ArticleHandler) HandleFind(w http.ResponseWriter, r *http.Request) {
 			tag = append(tag, v[0])
 		}
 	}
-	obj.HandleFindBase(w, r, cursor, userName, props, tag)
+	obj.HandleFindBase(w, r, cursor, userName, props, tag, mode)
 }
 
-func (obj *ArticleHandler) HandleFindBase(w http.ResponseWriter, r *http.Request, cursor, userName string, props map[string]string, tags []string) {
+func (obj *ArticleHandler) HandleFindBase(w http.ResponseWriter, r *http.Request, cursor, //
+	userName string, props map[string]string, tags []string, mode string) {
 	propObj := miniprop.NewMiniProp()
 	ctx := appengine.NewContext(r)
 	var foundObj *article.FoundArticles
@@ -36,16 +38,22 @@ func (obj *ArticleHandler) HandleFindBase(w http.ResponseWriter, r *http.Request
 	//
 	manager := obj.GetManager()
 	q := manager.NewArtQuery()
-	if len(tags) > 0 {
-		q.WithTags(ctx, tags)
-	}
-
 	if userName != "" {
 		q.WithUserName(ctx, userName)
 	}
 
 	if len(props) > 0 {
 		q.WithProp(ctx, props)
+	}
+
+	if len(tags) > 0 {
+		q.WithTags(ctx, tags)
+	}
+
+	if mode == "+update" || mode == "update" {
+		q.WithUpdatePulas(ctx)
+	} else if mode == "-update" {
+		q.WithUpdateMinus(ctx)
 	}
 	q.WithLimitOfFinding(ctx, manager.GetLimitOfFinding())
 	foundObj = obj.GetManager().FindArticleFromQuery(ctx, q.GetQuery(), cursor, true)

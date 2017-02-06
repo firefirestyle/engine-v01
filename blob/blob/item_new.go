@@ -5,18 +5,17 @@ import (
 
 	"time"
 
+	"github.com/firefirestyle/engine-v01/prop"
 	m "github.com/firefirestyle/engine-v01/prop"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/blobstore"
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/memcache"
-	"github.com/firefirestyle/engine-v01/prop"
 )
 
 func (obj *BlobManager) NewBlobItem(ctx context.Context, parent string, name string, blobKey string) *BlobItem {
 	ret := new(BlobItem)
 	ret.gaeObject = new(GaeObjectBlobItem)
-	ret.gaeObject.RootGroup = obj.config.RootGroup
 	{
 		p := prop.NewMiniPath(parent)
 		ret.gaeObject.Parent = p.GetDir()
@@ -80,25 +79,25 @@ func (obj *BlobManager) DeleteBlobItemFromStringId(ctx context.Context, stringId
 }
 
 type BlobItemKeyInfo struct {
-	RootGrouo string
-	Parent    string
-	Name      string
-	Sign      string
+	Kind   string
+	Parent string
+	Name   string
+	Sign   string
 }
 
 func (obj *BlobManager) GetKeyInfoFromStringId(stringId string) BlobItemKeyInfo {
 	propObj := m.NewMiniPropFromJson([]byte(stringId))
 	return BlobItemKeyInfo{
-		RootGrouo: propObj.GetString("p", ""),
-		Parent:    propObj.GetString("d", ""),
-		Name:      propObj.GetString("f", ""),
-		Sign:      propObj.GetString("s", ""),
+		Kind:   propObj.GetString("k", ""),
+		Parent: propObj.GetString("d", ""),
+		Name:   propObj.GetString("f", ""),
+		Sign:   propObj.GetString("s", ""),
 	}
 }
 
 func (obj *BlobManager) MakeStringId(parent string, name string, sign string) string {
 	propObj := m.NewMiniProp()
-	propObj.SetString("p", obj.config.RootGroup)
+	propObj.SetString("k", obj.config.Kind)
 	propObj.SetString("d", parent)
 	propObj.SetString("f", name)
 	propObj.SetString("s", sign)
@@ -107,7 +106,6 @@ func (obj *BlobManager) MakeStringId(parent string, name string, sign string) st
 
 func (obj *BlobManager) MakeBlobId(parent string, name string) string {
 	propObj := m.NewMiniProp()
-	propObj.SetString("p", obj.config.RootGroup)
 	propObj.SetString("d", parent)
 	propObj.SetString("f", name)
 	return string(propObj.ToJson())

@@ -1,13 +1,13 @@
 package blob
 
 import (
-	"golang.org/x/net/context"
-	//	"google.golang.org/appengine"
 	"crypto/hmac"
 	"crypto/sha1"
 	"errors"
 	"net/http"
 	"net/url"
+
+	"golang.org/x/net/context"
 
 	"io"
 
@@ -15,7 +15,6 @@ import (
 	"encoding/base64"
 	"strings"
 
-	//	"github.com/firefirestyle/go.miniprop"
 	"sort"
 
 	"github.com/kyorohiro/ramenhunter_sv_lib/go.miniprop"
@@ -52,7 +51,6 @@ func (obj *BlobManager) MakeRequestUrl(ctx context.Context, dirName string, file
 	hash := hmac.New(sha1.New, []byte(privateSign))
 	//	hash := sha1.New()
 
-	io.WriteString(hash, obj.config.RootGroup)
 	io.WriteString(hash, dirName)
 	io.WriteString(hash, obj.config.Kind)
 	io.WriteString(hash, fileName)
@@ -109,7 +107,6 @@ func (obj *BlobManager) CheckedCallback(r *http.Request, privateSign string) (*C
 	sort.Strings(keys)
 	//
 	//
-	io.WriteString(hash, obj.config.RootGroup)
 	io.WriteString(hash, dirName)
 	io.WriteString(hash, obj.config.Kind)
 	io.WriteString(hash, fileName)
