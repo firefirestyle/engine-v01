@@ -99,22 +99,36 @@ func (tmpObj *ArtTemplate) GetArtHundlerObj(ctx context.Context) *arthundler.Art
 
 func (tmpObj *ArtTemplate) InitArtApi() {
 
-	// art
-	// UrlArtNew
+	///
+	/// use login check
+	///
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtNew, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
-		tmpObj.GetArtHundlerObj(ctx).HandleNew(w, r)
+		propObj := miniprop.NewMiniPropFromJsonReader(r.Body)
+		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
+		if loginInfo.IsLogin == false {
+			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
+		} else {
+			tmpObj.InitalizeTemplate(ctx)
+			tmpObj.GetArtHundlerObj(ctx).HandleNewBase(w, r, propObj)
+		}
 	})
 
-	// art
-	// UrlArtNew
+	///
+	/// use login check
+	///
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtUpdate, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
-		tmpObj.GetArtHundlerObj(ctx).HandleUpdate(w, r)
+		propObj := miniprop.NewMiniPropFromJsonReader(r.Body)
+		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
+		if loginInfo.IsLogin == false {
+			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
+		} else {
+			tmpObj.InitalizeTemplate(ctx)
+			tmpObj.GetArtHundlerObj(ctx).HandleUpdateBase(w, r, propObj)
+		}
 	})
 
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtFind, func(w http.ResponseWriter, r *http.Request) {
@@ -124,6 +138,9 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 		tmpObj.GetArtHundlerObj(ctx).HandleFind(w, r)
 	})
 
+	///
+	/// use login check
+	///
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtFindMe, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
@@ -146,18 +163,29 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 	})
 	//UrlArtGet
 
+	///
+	/// use login check
+	///
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtRequestBlobUrl, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
-		tmpObj.GetArtHundlerObj(ctx).HandleBlobRequestToken(w, r)
+		propObj := miniprop.NewMiniPropFromJsonReader(r.Body)
+		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
+		if loginInfo.IsLogin == false {
+			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
+		} else {
+			tmpObj.InitalizeTemplate(ctx)
+			tmpObj.GetArtHundlerObj(ctx).HandleBlobRequestTokenBase(w, r, propObj)
+		}
 	})
 
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtCallbackBlobUrl, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
-		tmpObj.GetArtHundlerObj(ctx).HandleBlobUpdated(w, r)
+		{
+			tmpObj.InitalizeTemplate(ctx)
+			tmpObj.GetArtHundlerObj(ctx).HandleBlobUpdated(w, r)
+		}
 	})
 
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtBlobGet, func(w http.ResponseWriter, r *http.Request) {
@@ -167,16 +195,20 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 		tmpObj.GetArtHundlerObj(ctx).HandleBlobGet(w, r)
 	})
 
+	///
+	/// use login check
+	///
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtDelete, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
 		tmpObj.InitalizeTemplate(ctx)
 		propObj := miniprop.NewMiniPropFromJsonReader(r.Body)
-		//		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
-		//		if loginInfo.IsLogin == false {
-		//			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
-		//		} else
-		{
+		//
+		//
+		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
+		if loginInfo.IsLogin == false {
+			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
+		} else {
 			tmpObj.GetArtHundlerObj(ctx).HandleDeleteBaseWithFile(w, r, propObj.GetString("articleId", ""), propObj)
 		}
 	})

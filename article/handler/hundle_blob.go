@@ -48,10 +48,15 @@ func (obj *ArticleHandler) MakePath(articleId, dir string) string {
 }
 
 func (obj *ArticleHandler) HandleBlobRequestToken(w http.ResponseWriter, r *http.Request) {
-	//
-	// load param from json
 	params, _ := ioutil.ReadAll(r.Body)
 	inputPropObj := miniprop.NewMiniPropFromJson(params)
+	obj.HandleBlobRequestTokenBase(w, r, inputPropObj)
+}
+
+func (obj *ArticleHandler) HandleBlobRequestTokenBase(w http.ResponseWriter, r *http.Request, inputPropObj *miniprop.MiniProp) {
+	//
+	// load param from json
+
 	dir := inputPropObj.GetString("dir", "")
 	name := inputPropObj.GetString("file", "")
 	articleId := inputPropObj.GetString("articleId", "")

@@ -9,11 +9,14 @@ import (
 )
 
 func (obj *ArticleHandler) HandleNew(w http.ResponseWriter, r *http.Request) {
+	obj.HandleNewBase(w, r, obj.GetInputProp(w, r))
+}
+
+func (obj *ArticleHandler) HandleNewBase(w http.ResponseWriter, r *http.Request, inputProp *miniprop.MiniProp) {
 	ctx := appengine.NewContext(r)
 	propObj := miniprop.NewMiniProp()
 	//
 	// load param from json
-	inputProp := obj.GetInputProp(w, r)
 	title := inputProp.GetString("title", "")
 	//z	target := inputProp.GetString("target", "")
 	content := inputProp.GetString("content", "")

@@ -8,11 +8,15 @@ import (
 )
 
 func (obj *ArticleHandler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
+	obj.HandleUpdateBase(w, r, obj.GetInputProp(w, r))
+}
+
+func (obj *ArticleHandler) HandleUpdateBase(w http.ResponseWriter, r *http.Request, inputProp *miniprop.MiniProp) {
 	ctx := appengine.NewContext(r)
 	propObj := miniprop.NewMiniProp()
 	//
 	// load param from json
-	inputProp := obj.GetInputProp(w, r)
+
 	articleId := inputProp.GetString("articleId", "")
 	ownerName := inputProp.GetString("userName", "")
 
