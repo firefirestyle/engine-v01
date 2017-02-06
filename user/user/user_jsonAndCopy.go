@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	paProp "github.com/firefirestyle/engine-v01/prop"
+	"github.com/firefirestyle/engine-v01/prop"
 	"golang.org/x/net/context"
 )
 
@@ -23,7 +23,7 @@ func (userObj *User) SetUserFromsJson(ctx context.Context, source string) error 
 }
 
 func (userObj *User) SetUserFromsMap(ctx context.Context, v map[string]interface{}) {
-	propObj := paProp.NewMiniPropFromMap(v)
+	propObj := prop.NewMiniPropFromMap(v)
 	userObj.gaeObject.DisplayName = propObj.GetString(TypeDisplayName, "")
 	userObj.gaeObject.UserName = propObj.GetString(TypeUserName, "")
 	userObj.gaeObject.Created = propObj.GetTime(TypeCreated, time.Now()) //srcCreated
@@ -68,9 +68,9 @@ func (obj *User) ToMapAll() map[string]interface{} {
 }
 
 func (obj *User) ToJson() []byte {
-	return paProp.NewMiniPropFromMap(obj.ToMapAll()).ToJson()
+	return prop.NewMiniPropFromMap(obj.ToMapAll()).ToJson()
 }
 
 func (obj *User) ToJsonPublic() []byte {
-	return paProp.NewMiniPropFromMap(obj.ToMapPublic()).ToJson()
+	return prop.NewMiniPropFromMap(obj.ToMapPublic()).ToJson()
 }

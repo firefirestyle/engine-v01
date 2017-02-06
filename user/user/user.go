@@ -9,7 +9,7 @@ import (
 
 	"strconv"
 
-	paProp "github.com/firefirestyle/engine-v01/prop"
+	"github.com/firefirestyle/engine-v01/prop"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/datastore"
 )
@@ -78,7 +78,7 @@ func (obj *UserManager) newUserWithUserName(ctx context.Context) *User {
 	for {
 		hashObj := sha1.New()
 		now := time.Now().UnixNano()
-		io.WriteString(hashObj, paProp.MakeRandomId())
+		io.WriteString(hashObj, prop.MakeRandomId())
 		io.WriteString(hashObj, strconv.FormatInt(now, 36))
 		userName := string(base32.StdEncoding.EncodeToString(hashObj.Sum(nil)))
 		if obj.config.LengthHash >= 5 && len(userName) > obj.config.LengthHash {
@@ -200,7 +200,7 @@ func (obj *User) GetProp(name string) string {
 	if index < 0 {
 		return ""
 	}
-	p := paProp.NewMiniPropFromJson([]byte(obj.gaeObject.PropValues[index]))
+	p := prop.NewMiniPropFromJson([]byte(obj.gaeObject.PropValues[index]))
 	return p.GetString(name, "")
 }
 

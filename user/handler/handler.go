@@ -8,7 +8,7 @@ import (
 	miniblob "github.com/firefirestyle/engine-v01/blob/blob"
 	blobhandler "github.com/firefirestyle/engine-v01/blob/handler"
 	"github.com/firefirestyle/engine-v01/oauth/twitter"
-	miniprop "github.com/firefirestyle/engine-v01/prop"
+	"github.com/firefirestyle/engine-v01/prop"
 	minisession "github.com/firefirestyle/engine-v01/session"
 	miniuser "github.com/firefirestyle/engine-v01/user/user"
 	"golang.org/x/net/context"
@@ -21,8 +21,7 @@ type UserHandler struct {
 	sessionMgr     *minisession.SessionManager
 	blobHandler    *blobhandler.BlobHandler
 	twitterHandler *twitter.TwitterHandler
-	onEvents       UserHandlerOnEvent
-	completeFunc   func(w http.ResponseWriter, r *http.Request, outputProp *miniprop.MiniProp, hh *blobhandler.BlobHandler, blobObj *miniblob.BlobItem) error
+	completeFunc   func(w http.ResponseWriter, r *http.Request, outputProp *prop.MiniProp, hh *blobhandler.BlobHandler, blobObj *miniblob.BlobItem) error
 }
 
 type UserHandlerManagerConfig struct {
@@ -33,16 +32,6 @@ type UserHandlerManagerConfig struct {
 	BlobSign                   string
 	MemcachedOnlyInBlobPointer bool
 	LengthHash                 int
-}
-
-type UserHandlerOnEvent struct {
-	OnGetUserRequestList       []func(w http.ResponseWriter, r *http.Request, h *UserHandler, o *miniprop.MiniProp) error
-	OnGetUserFailedList        []func(w http.ResponseWriter, r *http.Request, h *UserHandler, o *miniprop.MiniProp)
-	OnGetUserSuccessList       []func(w http.ResponseWriter, r *http.Request, h *UserHandler, i *miniuser.User, o *miniprop.MiniProp) error
-	OnUpdateUserRequestList    []func(w http.ResponseWriter, r *http.Request, h *UserHandler, i *miniprop.MiniProp, o *miniprop.MiniProp) error
-	OnUpdateUserFailedList     []func(w http.ResponseWriter, r *http.Request, h *UserHandler, i *miniprop.MiniProp, o *miniprop.MiniProp)
-	OnUpdateUserBeforeSaveList []func(w http.ResponseWriter, r *http.Request, h *UserHandler, u *miniuser.User, i *miniprop.MiniProp, o *miniprop.MiniProp) error
-	OnUpdateUserSuccessList    []func(w http.ResponseWriter, r *http.Request, h *UserHandler, u *miniuser.User, i *miniprop.MiniProp, o *miniprop.MiniProp) error
 }
 
 func NewUserHandler(callbackUrl string, //
@@ -78,7 +67,6 @@ func NewUserHandler(callbackUrl string, //
 			CallbackUrl: callbackUrl,
 			HashLength:  10,
 		}),
-		onEvents: UserHandlerOnEvent{},
 	}
 
 	ret.blobHandler.AddOnBlobComplete(ret.OnBlobComplete)
@@ -110,11 +98,11 @@ func (obj *UserHandler) CheckLoginFromToken(r *http.Request, token string, useIp
 	return obj.GetSessionMgr().CheckAccessToken(ctx, token, minisession.MakeOptionInfo(r), useIp)
 }
 
-func (obj *UserHandler) HandleError(w http.ResponseWriter, r *http.Request, outputProp *miniprop.MiniProp, errorCode int, errorMessage string) {
+func (obj *UserHandler) HandleError(w http.ResponseWriter, r *http.Request, outputProp *prop.MiniProp, errorCode int, errorMessage string) {
 	//
 	//
 	if outputProp == nil {
-		outputProp = miniprop.NewMiniProp()
+		outputProp = prop.NewMiniProp()
 	}
 	if errorCode != 0 {
 		outputProp.SetInt("errorCode", errorCode)

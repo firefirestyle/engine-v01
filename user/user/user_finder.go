@@ -51,7 +51,7 @@ func (obj *UserManager) FindUserWithPoint(ctx context.Context, cursorSrc string,
 
 func (obj *UserManager) FindUserFromProp(ctx context.Context, key string, value string, cursorSrc string, keyOnly bool) *FoundUser {
 	q := datastore.NewQuery(obj.config.UserKind)
-	v := MakePropValue(key,value)
+	v := MakePropValue(key, value)
 	q = q.Filter("Props.Value =", v) ////
 	q = q.Limit(obj.config.LimitOfFinding)
 	return obj.FindUserFromQuery(ctx, q, cursorSrc, keyOnly)
@@ -87,7 +87,6 @@ func (obj *UserManager) FindUserFromQuery(ctx context.Context, queryObj *datasto
 			break
 		} else {
 			if keyOnly == true {
-				log.Infof(ctx, ">>key>>"+key.StringID())
 				userIdsList = append(userIdsList, key.StringID())
 			} else {
 				userObj := obj.newUserFromStringID(ctx, key.StringID())

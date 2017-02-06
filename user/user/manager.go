@@ -52,13 +52,15 @@ func (obj *UserManager) GetUserFromUserName(ctx context.Context, userName string
 	return foundUser.Users[0], nil
 }
 
-func (obj *UserManager) SaveUser(ctx context.Context, userObj *User) error {
+func (obj *UserManager) SaveUser(ctx context.Context, userObj *User) (*User, error) {
 	nextUser := obj.cloneUser(ctx, userObj)
 	e := nextUser.pushToDB(ctx)
 	if e == nil {
 		datastore.Delete(ctx, userObj.gaeObjectKey)
+		return nextUser, e
+	} else {
+		return nil, e
 	}
-	return e
 }
 
 func (obj *UserManager) DeleteUser(ctx context.Context, userName string, sign string) error {

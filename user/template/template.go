@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/firefirestyle/engine-v01/oauth/twitter"
-	miniprop "github.com/firefirestyle/engine-v01/prop"
+	"github.com/firefirestyle/engine-v01/prop"
 	minisession "github.com/firefirestyle/engine-v01/session"
 
 	"sync"
@@ -87,7 +87,7 @@ func (tmpObj *UserTemplate) InitalizeTemplate(ctx context.Context) {
 	tmpObj.initOpt = nil
 }
 
-func (tmpObj *UserTemplate) CheckLogin(r *http.Request, input *miniprop.MiniProp, useIp bool) minisession.CheckResult {
+func (tmpObj *UserTemplate) CheckLogin(r *http.Request, input *prop.MiniProp, useIp bool) minisession.CheckResult {
 	//	ctx := appengine.NewContext(r)
 	token := input.GetString("token", "")
 	return tmpObj.CheckLoginFromToken(r, token, useIp)
@@ -158,12 +158,12 @@ func (tmpObj *UserTemplate) InitUserApi() {
 		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		params, _ := ioutil.ReadAll(r.Body)
-		input := miniprop.NewMiniPropFromJson(params)
+		input := prop.NewMiniPropFromJson(params)
 		ret := tmpObj.CheckLogin(r, input, true)
 		Debug(appengine.NewContext(r), "(1) ---- ")
 
 		if ret.IsLogin == false {
-			tmpObj.userHandlerObj.HandleError(w, r, miniprop.NewMiniProp(), 1001, "Failed in token check")
+			tmpObj.userHandlerObj.HandleError(w, r, prop.NewMiniProp(), 1001, "Failed in token check")
 			return
 		} else {
 			tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleBlobRequestTokenBase(w, r, input)

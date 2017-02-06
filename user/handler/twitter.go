@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/firefirestyle/engine-v01/oauth/twitter"
-	//	minipointer "github.com/firefirestyle/engine-v01/pointer"
 	miniprop "github.com/firefirestyle/engine-v01/prop"
 	minisession "github.com/firefirestyle/engine-v01/session"
 	miniuser "github.com/firefirestyle/engine-v01/user/user"
