@@ -156,7 +156,7 @@ func (obj *AccessToken) Logout(ctx context.Context) error {
 
 func (obj *AccessToken) Save(ctx context.Context) error {
 	_, e := datastore.Put(ctx, obj.gaeObjectKey, obj.gaeObject)
-	if e != nil {
+	if e == nil {
 		obj.UpdateMemcache(ctx)
 	}
 	return e

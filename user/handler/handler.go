@@ -95,6 +95,7 @@ func Debug(ctx context.Context, message string) {
 
 func (obj *UserHandler) CheckLoginFromToken(r *http.Request, token string, useIp bool) minisession.CheckResult {
 	ctx := appengine.NewContext(r)
+	Debug(appengine.NewContext(r), "AA00")
 	return obj.GetSessionMgr().CheckAccessToken(ctx, token, minisession.MakeOptionInfo(r), useIp)
 }
 

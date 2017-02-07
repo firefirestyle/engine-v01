@@ -121,6 +121,7 @@ func (obj *SessionManager) MakeLoginIdInfo(userName string, config OptionInfo) S
 }
 
 func (obj *SessionManager) CheckAccessToken(ctx context.Context, accessToken string, option OptionInfo, isIPCheck bool) CheckResult {
+	Debug(ctx, ""+accessToken)
 	accessTokenObj, err := obj.LoadAccessToken(ctx, accessToken)
 	if err != nil {
 		return CheckResult{
@@ -139,6 +140,7 @@ func (obj *SessionManager) CheckAccessToken(ctx context.Context, accessToken str
 
 	//
 	if isIPCheck == true {
+
 		if accessTokenObj.GetDeviceId() != obj.MakeDeviceId(accessTokenObj.GetUserName(), option) {
 			return CheckResult{
 				IsLogin:        false,
