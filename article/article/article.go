@@ -69,6 +69,10 @@ func (obj *Article) updateMemcache(ctx context.Context) error {
 //
 //
 //
+func (obj *Article) GetStringId() string {
+	return obj.gaeObjectKey.StringID()
+}
+
 func (obj *Article) GetGaeObjectKind() string {
 	return obj.kind
 }

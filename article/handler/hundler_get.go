@@ -9,7 +9,7 @@ import (
 )
 
 func (obj *ArticleHandler) HandleGet(w http.ResponseWriter, r *http.Request) {
-	propObj := miniprop.NewMiniProp()
+
 	ctx := appengine.NewContext(r)
 	values := r.URL.Query()
 	key := values.Get("key")
@@ -32,12 +32,14 @@ func (obj *ArticleHandler) HandleGet(w http.ResponseWriter, r *http.Request) {
 		artObj, err = obj.GetManager().GetArticleFromPointer(ctx, articleId)
 	}
 	if err != nil {
-		obj.HandleError(w, r, propObj, ErrorCodeNotFoundArticleId, "not found article")
+		obj.HandleError(w, r, miniprop.NewMiniProp(), ErrorCodeNotFoundArticleId, "not found article")
 		return
 	}
 	if sign != "" {
 		w.Header().Set("Cache-Control", "public, max-age=2592000")
 	}
+	propObj := miniprop.NewMiniProp()
+	propObj.SetString("articleKey", artObj.GetStringId())
 	propObj.CopiedOver(miniprop.NewMiniPropFromMap(artObj.ToMap()))
 	w.Write(propObj.ToJson())
 }

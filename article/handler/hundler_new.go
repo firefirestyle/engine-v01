@@ -68,6 +68,7 @@ func (obj *ArticleHandler) HandleNewBase(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	propObj.SetPropString("", "articleId", nextArtObj.GetArticleId())
+	propObj.SetPropString("", "articleKey", nextArtObj.GetStringId())
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(propObj.ToJson())

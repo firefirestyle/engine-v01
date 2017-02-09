@@ -12,6 +12,7 @@ import (
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 
+	"errors"
 	"sync"
 )
 
@@ -79,9 +80,36 @@ func (tmpObj *ArtTemplate) InitalizeTemplate(ctx context.Context) {
 	tmpObj.initOpt = nil
 }
 
-func (tmpObj *ArtTemplate) CheckLogin(r *http.Request, token string, useIp bool) minisession.CheckResult {
+func (tmpObj *ArtTemplate) CheckArticleOwner(ctx context.Context, checkResult minisession.CheckResult, articleId string) error {
+	manager := tmpObj.GetArtHundlerObj(ctx).GetManager()
+	artObj, artErr := manager.GetArticleFromPointer(ctx, articleId)
+	if artErr != nil {
+		Debug(ctx, "====> A")
+		return artErr
+	}
 
-	return tmpObj.getUserHundler(appengine.NewContext(r)).CheckLogin(r, token, useIp)
+	if artObj.GetUserName() == checkResult.AccessTokenObj.GetUserName() {
+		Debug(ctx, "====> B")
+
+		return nil
+	}
+
+	userManager := tmpObj.getUserHundler(ctx).GetManager()
+	usrObj, userErr := userManager.GetUserFromUserName(ctx, checkResult.AccessTokenObj.GetUserName())
+	if userErr != nil {
+		Debug(ctx, "====> C")
+		return userErr
+	}
+	if usrObj.IsMaster() {
+		return nil
+	}
+
+	return errors.New("failed to check article pwner")
+}
+
+func (tmpObj *ArtTemplate) CheckLogin(r *http.Request, token string, useIp bool) minisession.CheckResult {
+	check := tmpObj.getUserHundler(appengine.NewContext(r)).CheckLogin(r, token, useIp)
+	return check
 }
 
 func (tmpObj *ArtTemplate) GetArtHundlerObj(ctx context.Context) *arthundler.ArticleHandler {
@@ -109,10 +137,11 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
 		if loginInfo.IsLogin == false {
 			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
-		} else {
-			tmpObj.InitalizeTemplate(ctx)
-			tmpObj.GetArtHundlerObj(ctx).HandleNewBase(w, r, propObj)
+			return
 		}
+		tmpObj.InitalizeTemplate(ctx)
+		tmpObj.GetArtHundlerObj(ctx).HandleNewBase(w, r, propObj)
+
 	})
 
 	///
@@ -125,10 +154,19 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
 		if loginInfo.IsLogin == false {
 			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
-		} else {
-			tmpObj.InitalizeTemplate(ctx)
-			tmpObj.GetArtHundlerObj(ctx).HandleUpdateBase(w, r, propObj)
+			return
+
 		}
+
+		ownerCheckErr := tmpObj.CheckArticleOwner(ctx, loginInfo, propObj.GetString("articleId", ""))
+		if ownerCheckErr != nil {
+			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4002, "failed to owner check")
+			return
+		}
+
+		tmpObj.InitalizeTemplate(ctx)
+		tmpObj.GetArtHundlerObj(ctx).HandleUpdateBase(w, r, propObj)
+
 	})
 
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtFind, func(w http.ResponseWriter, r *http.Request) {
@@ -208,9 +246,15 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
 		if loginInfo.IsLogin == false {
 			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
-		} else {
-			tmpObj.GetArtHundlerObj(ctx).HandleDeleteBaseWithFile(w, r, propObj.GetString("articleId", ""), propObj)
+			return
 		}
+		ownerCheckErr := tmpObj.CheckArticleOwner(ctx, loginInfo, propObj.GetString("articleId", ""))
+		if ownerCheckErr != nil {
+			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4002, "failed to owner check")
+			return
+		}
+		tmpObj.GetArtHundlerObj(ctx).HandleDeleteBaseWithFile(w, r, propObj.GetString("articleId", ""), propObj)
+
 	})
 	//
 }

@@ -94,6 +94,7 @@ func (obj *ArticleHandler) HandleUpdateBase(w http.ResponseWriter, r *http.Reque
 		return
 	} else {
 		propObj.SetPropString("", "articleId", artObj.GetArticleId())
+		propObj.SetPropString("", "articleKey", artObj.GetStringId())
 		w.WriteHeader(http.StatusOK)
 		w.Write(propObj.ToJson())
 	}
