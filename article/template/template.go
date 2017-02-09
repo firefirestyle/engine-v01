@@ -84,20 +84,16 @@ func (tmpObj *ArtTemplate) CheckArticleOwner(ctx context.Context, checkResult mi
 	manager := tmpObj.GetArtHundlerObj(ctx).GetManager()
 	artObj, artErr := manager.GetArticleFromPointer(ctx, articleId)
 	if artErr != nil {
-		Debug(ctx, "====> A")
 		return artErr
 	}
 
 	if artObj.GetUserName() == checkResult.AccessTokenObj.GetUserName() {
-		Debug(ctx, "====> B")
-
 		return nil
 	}
 
 	userManager := tmpObj.getUserHundler(ctx).GetManager()
 	usrObj, userErr := userManager.GetUserFromUserName(ctx, checkResult.AccessTokenObj.GetUserName())
 	if userErr != nil {
-		Debug(ctx, "====> C")
 		return userErr
 	}
 	if usrObj.IsMaster() {

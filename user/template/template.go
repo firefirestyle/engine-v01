@@ -173,7 +173,6 @@ func (tmpObj *UserTemplate) InitUserApi() {
 	http.HandleFunc(UrlUserCallbackBlobUrl, func(w http.ResponseWriter, r *http.Request) {
 		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
-		Debug(appengine.NewContext(r), "(2) ---- ")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleBlobUpdated(w, r)
 	})
 
