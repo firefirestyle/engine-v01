@@ -211,10 +211,16 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), false)
 		if loginInfo.IsLogin == false {
 			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
-		} else {
-			tmpObj.InitalizeTemplate(ctx)
-			tmpObj.GetArtHundlerObj(ctx).HandleBlobRequestTokenBase(w, r, propObj)
+			return
 		}
+		ownerCheckErr := tmpObj.CheckArticleOwner(ctx, loginInfo, propObj.GetString("articleId", ""))
+		if ownerCheckErr != nil {
+			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4002, "failed to owner check")
+			return
+		}
+		tmpObj.InitalizeTemplate(ctx)
+		tmpObj.GetArtHundlerObj(ctx).HandleBlobRequestTokenBase(w, r, propObj)
+
 	})
 
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtCallbackBlobUrl, func(w http.ResponseWriter, r *http.Request) {
