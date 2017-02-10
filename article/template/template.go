@@ -13,7 +13,6 @@ import (
 	"google.golang.org/appengine/log"
 
 	"errors"
-	"sync"
 )
 
 const (
@@ -38,8 +37,6 @@ type ArtTemplate struct {
 	config         ArtTemplateConfig
 	artHandlerObj  *arthundler.ArticleHandler
 	getUserHundler func(context.Context) *userHandler.UserHandler
-	initOpt        func(context.Context)
-	m              *sync.Mutex
 }
 
 func NewArtTemplate(config ArtTemplateConfig, getUserHundler func(context.Context) *userHandler.UserHandler) *ArtTemplate {
@@ -54,30 +51,7 @@ func NewArtTemplate(config ArtTemplateConfig, getUserHundler func(context.Contex
 	return &ArtTemplate{
 		config:         config,
 		getUserHundler: getUserHundler,
-		initOpt:        func(context.Context) {},
-		m:              new(sync.Mutex),
 	}
-}
-
-func (tmpObj *ArtTemplate) SetInitFunc(f func(ctx context.Context)) {
-	tmpObj.m.Lock()
-	defer tmpObj.m.Unlock()
-	tmpObj.initOpt = f
-}
-
-func (tmpObj *ArtTemplate) InitalizeTemplate(ctx context.Context) {
-
-	if tmpObj.initOpt == nil {
-		return
-	}
-	tmpObj.m.Lock()
-	defer tmpObj.m.Unlock()
-	tmpObj.GetArtHundlerObj(ctx)
-	tmpObj.getUserHundler(ctx)
-	if tmpObj.initOpt != nil {
-		tmpObj.initOpt(ctx)
-	}
-	tmpObj.initOpt = nil
 }
 
 func (tmpObj *ArtTemplate) CheckArticleOwner(ctx context.Context, checkResult minisession.CheckResult, articleId string) error {
@@ -135,7 +109,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4001, "failed to login")
 			return
 		}
-		tmpObj.InitalizeTemplate(ctx)
 		tmpObj.GetArtHundlerObj(ctx).HandleNewBase(w, r, propObj)
 
 	})
@@ -160,7 +133,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 			return
 		}
 
-		tmpObj.InitalizeTemplate(ctx)
 		tmpObj.GetArtHundlerObj(ctx).HandleUpdateBase(w, r, propObj)
 
 	})
@@ -168,7 +140,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtFind, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
 		tmpObj.GetArtHundlerObj(ctx).HandleFind(w, r)
 	})
 
@@ -178,7 +149,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtFindMe, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
 		propObj := miniprop.NewMiniPropFromJsonReader(r.Body)
 		loginInfo := tmpObj.CheckLogin(r, propObj.GetString("token", ""), true)
 		if loginInfo.IsLogin == false {
@@ -192,7 +162,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtGet, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
 		tmpObj.GetArtHundlerObj(ctx).HandleGet(w, r)
 	})
 	//UrlArtGet
@@ -214,7 +183,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 			tmpObj.GetArtHundlerObj(ctx).HandleError(w, r, nil, 4002, "failed to owner check")
 			return
 		}
-		tmpObj.InitalizeTemplate(ctx)
 		tmpObj.GetArtHundlerObj(ctx).HandleBlobRequestTokenBase(w, r, propObj)
 
 	})
@@ -223,7 +191,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
 		{
-			tmpObj.InitalizeTemplate(ctx)
 			tmpObj.GetArtHundlerObj(ctx).HandleBlobUpdated(w, r)
 		}
 	})
@@ -231,7 +198,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtBlobGet, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
 		tmpObj.GetArtHundlerObj(ctx).HandleBlobGet(w, r)
 	})
 
@@ -241,7 +207,6 @@ func (tmpObj *ArtTemplate) InitArtApi() {
 	http.HandleFunc(tmpObj.config.BasePath+UrlArtDelete, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		ctx := appengine.NewContext(r)
-		tmpObj.InitalizeTemplate(ctx)
 		propObj := miniprop.NewMiniPropFromJsonReader(r.Body)
 		//
 		//

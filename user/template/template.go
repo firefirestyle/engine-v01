@@ -7,8 +7,6 @@ import (
 	"github.com/firefirestyle/engine-v01/prop"
 	minisession "github.com/firefirestyle/engine-v01/session"
 
-	"sync"
-
 	"io/ioutil"
 
 	userhundler "github.com/firefirestyle/engine-v01/user/handler"
@@ -51,8 +49,6 @@ type UserTemplateConfig struct {
 type UserTemplate struct {
 	config         UserTemplateConfig
 	userHandlerObj *userhundler.UserHandler
-	initOpt        func(context.Context)
-	m              *sync.Mutex
 }
 
 func NewUserTemplate(config UserTemplateConfig) *UserTemplate {
@@ -61,30 +57,8 @@ func NewUserTemplate(config UserTemplateConfig) *UserTemplate {
 	}
 
 	return &UserTemplate{
-		config:  config,
-		initOpt: func(context.Context) {},
-		m:       new(sync.Mutex),
+		config: config,
 	}
-}
-
-func (tmpObj *UserTemplate) SetInitFunc(f func(ctx context.Context)) {
-	tmpObj.m.Lock()
-	defer tmpObj.m.Unlock()
-	tmpObj.initOpt = f
-}
-
-func (tmpObj *UserTemplate) InitalizeTemplate(ctx context.Context) {
-
-	if tmpObj.initOpt == nil {
-		return
-	}
-	tmpObj.m.Lock()
-	defer tmpObj.m.Unlock()
-	tmpObj.GetUserHundlerObj(ctx)
-	if tmpObj.initOpt != nil {
-		tmpObj.initOpt(ctx)
-	}
-	tmpObj.initOpt = nil
 }
 
 func (tmpObj *UserTemplate) CheckLogin(r *http.Request, input *prop.MiniProp, useIp bool) minisession.CheckResult {
@@ -130,32 +104,27 @@ func (tmpObj *UserTemplate) GetUserHundlerObj(ctx context.Context) *userhundler.
 func (tmpObj *UserTemplate) InitUserApi() {
 	// twitter
 	http.HandleFunc(UrlTwitterTokenUrlRedirect, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleTwitterRequestToken(w, r)
 	})
 
 	http.HandleFunc(UrlTwitterTokenCallback, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleTwitterCallbackToken(w, r)
 	})
 
 	// user
 	http.HandleFunc(UrlUserGet, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleGet(w, r)
 	})
 
 	http.HandleFunc(UrlUserFind, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleFind(w, r)
 	})
 
 	http.HandleFunc(UrlUserRequestBlobUrl, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		params, _ := ioutil.ReadAll(r.Body)
 		input := prop.NewMiniPropFromJson(params)
@@ -171,32 +140,27 @@ func (tmpObj *UserTemplate) InitUserApi() {
 	})
 
 	http.HandleFunc(UrlUserCallbackBlobUrl, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleBlobUpdated(w, r)
 	})
 
 	http.HandleFunc(UrlUserBlobGet, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleBlobGet(w, r)
 	})
 
 	// me
 	http.HandleFunc(UrlMeLogout, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleLogout(w, r)
 	})
 
 	http.HandleFunc(UrlMeUpdate, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleUpdateInfo(w, r)
 	})
 
 	http.HandleFunc(UrlMeGet, func(w http.ResponseWriter, r *http.Request) {
-		tmpObj.InitalizeTemplate(appengine.NewContext(r))
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		tmpObj.GetUserHundlerObj(appengine.NewContext(r)).HandleGetMe(w, r)
 	})
