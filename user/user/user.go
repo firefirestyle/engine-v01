@@ -102,6 +102,15 @@ func (obj *UserManager) newUser(ctx context.Context, userName string, sign strin
 	e := ret.loadFromDB(ctx)
 	return ret, e
 }
+func (obj *UserManager) newDummyUser(ctx context.Context, userName string, sign string) *User {
+	ret := new(User)
+	ret.prop = make(map[string]map[string]interface{})
+	ret.kind = obj.config.UserKind
+	ret.gaeObject = new(GaeUserItem)
+	ret.gaeObject.UserName = userName
+	ret.gaeObjectKey = obj.newUserGaeObjectKey(ctx, userName, sign)
+	return ret
+}
 
 func (obj *UserManager) cloneUser(ctx context.Context, user *User) *User {
 	ret := new(User)

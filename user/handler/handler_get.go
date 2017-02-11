@@ -54,6 +54,9 @@ func (obj *UserHandler) HandleGetBase(w http.ResponseWriter, r *http.Request, us
 		w.Header().Set("Cache-Control", "public, max-age=2592000")
 	}
 
+	if usrObj.GetStatus() != "public" {
+		usrObj = obj.GetManager().NewDummyUser(ctx)
+	}
 	if includePrivate == true {
 		outputProp.CopiedOver(miniprop.NewMiniPropFromMap(usrObj.ToMapAll()))
 	} else {

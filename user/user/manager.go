@@ -44,6 +44,10 @@ func (obj *UserManager) NewNewUser(ctx context.Context) *User {
 	return obj.newUserWithUserName(ctx)
 }
 
+func (obj *UserManager) NewDummyUser(ctx context.Context) *User {
+	return obj.newDummyUser(ctx, "dummy", "dummy")
+}
+
 func (obj *UserManager) GetUserFromUserName(ctx context.Context, userName string) (*User, error) {
 	foundUser := obj.FindUserWithUserName(ctx, userName, false)
 	if len(foundUser.Users) == 0 {
