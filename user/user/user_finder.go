@@ -37,20 +37,6 @@ func (obj *UserManager) FindUserWithUserName(ctx context.Context, userName strin
 	return obj.FindUserFromQuery(ctx, q, "", keyOnly)
 }
 
-func (obj *UserManager) FindUserWithNewOrder(ctx context.Context, cursorSrc string, keyOnly bool) *FoundUser {
-	q := datastore.NewQuery(obj.config.UserKind)
-	q = q.Order("-Updated")
-	q = q.Limit(obj.config.LimitOfFinding)
-	return obj.FindUserFromQuery(ctx, q, cursorSrc, keyOnly)
-}
-
-func (obj *UserManager) FindUserWithPoint(ctx context.Context, cursorSrc string, keyOnly bool) *FoundUser {
-	q := datastore.NewQuery(obj.config.UserKind)
-	q = q.Order("-Point")
-	q = q.Limit(obj.config.LimitOfFinding)
-	return obj.FindUserFromQuery(ctx, q, cursorSrc, keyOnly)
-}
-
 func (obj *UserManager) FindUserFromProp(ctx context.Context, key string, value string, cursorSrc string, keyOnly bool) *FoundUser {
 	q := datastore.NewQuery(obj.config.UserKind)
 	v := MakePropValue(key, value)

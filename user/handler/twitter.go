@@ -71,6 +71,7 @@ func (obj *UserHandler) LoginRegistFromSNS(ctx context.Context, screenName strin
 	privateProp.SetString("i", userId)
 	privateProp.SetString("t", oauthToken)
 	user.SetPrivateInfo(string(privateProp.ToJson()))
+	user.SetStatus(miniuser.UserStatePublic)
 	obj.GetManager().SaveUser(ctx, user)
 
 	return user, nil

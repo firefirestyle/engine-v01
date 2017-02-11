@@ -15,8 +15,7 @@ func (obj *UserHandler) HandleUpdateInfo(w http.ResponseWriter, r *http.Request)
 	inputProp := miniprop.NewMiniPropFromJson(v)
 	ctx := appengine.NewContext(r)
 	userName := inputProp.GetString("userName", "")
-	displayName := inputProp.GetString("displayName", "")
-	content := inputProp.GetString("content", "")
+
 	token := inputProp.GetString("token", "")
 
 	//
@@ -48,8 +47,25 @@ func (obj *UserHandler) HandleUpdateInfo(w http.ResponseWriter, r *http.Request)
 		obj.HandleError(w, r, outputProp, 2002, userErr.Error())
 		return
 	}
-	usrObj.SetDisplayName(displayName)
-	usrObj.SetCont(content)
+
+	{
+		const key = "displayName"
+		if inputProp.Contain(key) {
+			usrObj.SetDisplayName(inputProp.GetString(key, ""))
+		}
+	}
+	{
+		const key = "content"
+		if inputProp.Contain(key) {
+			usrObj.SetCont(inputProp.GetString(key, ""))
+		}
+	}
+	{
+		const key = "status"
+		if inputProp.Contain(key) {
+			usrObj.SetStatus(inputProp.GetString(key, ""))
+		}
+	}
 	nextUserObj, nextUserErr := obj.GetManager().SaveUserWithImmutable(ctx, usrObj)
 	if nextUserErr != nil {
 		obj.HandleError(w, r, outputProp, 2004, userErr.Error())

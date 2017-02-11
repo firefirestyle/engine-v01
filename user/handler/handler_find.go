@@ -13,14 +13,15 @@ func (obj *UserHandler) HandleFind(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	values := r.URL.Query()
 	cursor := values.Get("cursor")
-	mode := values.Get("mode")
+	//	mode := values.Get("mode")
 	keyOnly := true
 	var foundObj *user.FoundUser = nil
-	if mode == "-point" {
-		foundObj = obj.manager.FindUserWithPoint(ctx, cursor, keyOnly)
-	} else {
-		foundObj = obj.manager.FindUserWithNewOrder(ctx, cursor, keyOnly)
-	}
+
+	//
+	q := obj.GetManager().NewUserQuery()
+	q.WithStatus(ctx, user.UserStatePublic)
+	foundObj = obj.manager.FindUserFromQuery(ctx, q.GetQuery(), cursor, keyOnly)
+
 	propObj.SetPropStringList("", "keys", foundObj.UserIds)
 	propObj.SetPropString("", "cursorOne", foundObj.CursorOne)
 	propObj.SetPropString("", "cursorNext", foundObj.CursorNext)
