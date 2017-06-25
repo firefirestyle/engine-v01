@@ -16,8 +16,7 @@ import (
 	"strings"
 
 	"sort"
-
-	"github.com/kyorohiro/ramenhunter_sv_lib/go.miniprop"
+	miniprop "github.com/firefirestyle/engine-v01/prop"
 	"google.golang.org/appengine/blobstore"
 )
 
